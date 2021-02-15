@@ -4,7 +4,6 @@ var newQueue;
 var globalQueue = new Map();
 const ytdlcore = require("ytdl-core");
 const ytpl = require("ytpl");
-const skip = require("./skip");
 async function execute(id,voiceChannel,queue,serverQueue,songs,message) {
     if(serverQueue){
         newQueue = queue;
