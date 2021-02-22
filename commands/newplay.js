@@ -2,7 +2,7 @@ const queues = new Map()
 const ytSearch = require("yt-search")
 const ytPlaylist = require("ytpl")
 const ytdl = require("ytdl-core-discord")
-const {prefix} = require("../../config.json")
+const {prefix} = require("../config.json")
 
 async function play(message) {
     const serverQueue = queues.get(message.guildID);
