@@ -87,7 +87,7 @@ async function execute(message) {
 
 function skip(message) {
     const skipQueue = queues.get(message.guildID);
-    if(skipQueue) {
+    if(skipQueue && skipQueue.songs[0]) {
         skipQueue.songs.shift();
         queues.set(message.guildID, skipQueue);
         play(message);
@@ -99,7 +99,7 @@ function skip(message) {
 
 function stop(message) {
     const stopQueue = queues.get(message.guildID);
-    if(stopQueue) {
+    if(stopQueue && stopQueue.songs[0]) {
         stopQueue.songs = [];
         queues.set(message.guildID, stopQueue);
         play(message);
