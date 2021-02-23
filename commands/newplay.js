@@ -18,7 +18,7 @@ async function play(message) {
     }
     if(!serverQueue.songs[0]) {
         queues.delete(message.guildID)
-        serverQueue.voiceChannel.leave();
+        setTimeout(() =>serverQueue.voiceChannel.leave(),1800000)
         return;
     }
     serverQueue.playing = true
@@ -30,8 +30,9 @@ async function play(message) {
     })
     .on("finish", () => {
         serverQueue.songs.shift();
+        serverQueue.playing = false;
         queues.set(message.guildID, serverQueue)
-        play(message)
+        play(message);
     })
     .on("error", error => console.error(error));
     serverQueue.dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
@@ -52,15 +53,15 @@ async function execute(message) {
         };
         queues.set(message.guildID, queueConstructor);
     }
-    const messageTreated = message.content.substr(6)
+    const messageTreated = message.content.substr(6);
     const newQueue = queues.get(message.guildID);
     if(messageTreated.startsWith("http")) {
         if(messageTreated.includes("playlist")) {
             const playlistSearched = await ytPlaylist(messageTreated)
             playlistSearched.items.forEach(element => {
-                newQueue.songs.push(element.url)
+                newQueue.songs.push(element.url);
             });
-        } 
+        }
         else {
             newQueue.songs.push(messageTreated);
         }
@@ -70,7 +71,7 @@ async function execute(message) {
             const ytSearchSong = await ytSearch(messageTreated);
             newQueue.songs.push(ytSearchSong.videos[0].url);
         } catch (error) {
-            message.channel.send("Musica não encontrada. Tente Novamente")
+            message.channel.send("Musica não encontrada. Tente Novamente");
         }
         const ytSearchSong = await ytSearch(messageTreated);
         newQueue.songs.push(ytSearchSong);
@@ -78,8 +79,8 @@ async function execute(message) {
     newQueue.voiceChannel = message.member.voice.channel;
     newQueue.connection = await newQueue.voiceChannel.join();
     queues.set(message.guildID, newQueue);
-    message.channel.send("Música(s) adicionada(s) à fila")
-    if(!newQueue.playing){
+    message.channel.send("Música(s) adicionada(s) à fila");
+    if(!newQueue.playing) {
         play(message);
     }
 }
@@ -115,7 +116,7 @@ module.exports ={
             if(message.author.bot)return;
             if(!message.content.startsWith(`${prefix}`)) return;
             if(message.content.startsWith(`${prefix}play`)) {
-                execute(message)
+                execute(message);
             }
         })
     },
@@ -136,5 +137,5 @@ module.exports ={
                 stop(message);
             }
         })
-    }  
+    } 
 }
