@@ -2,7 +2,6 @@ const express = require("express");
 const {token,prefix} = require("./config.json");
 const Discord = require("discord.js");
 const client = new Discord.Client();
-const music = require("./commands/play");
 const helpCommand = require("./commands/help");
 
 client.queues = new Map();
@@ -11,13 +10,11 @@ const newplay = require("./commands/newplay");
 
 client.once("ready", () => {
     console.log("Bot Online")
-    newplay.songAdd(client);
-    newplay.stopSong(client);
-    newplay.skipSong(client);
+    newplay(client);
 })
 
 const app = express();
-client.on("message",async (message)=> {
+client.on("message",async (message) => {
     if(message.author.bot) return;
     else if(!message.content.startsWith(prefix)) return;
     else if(message.content.startsWith(`${prefix}help`)) {

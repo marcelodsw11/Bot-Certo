@@ -1,8 +1,8 @@
-const queues = new Map()
-const ytSearch = require("yt-search")
-const ytPlaylist = require("ytpl")
-const ytdl = require("ytdl-core-discord")
-const {prefix} = require("../config.json")
+const queues = new Map();
+const ytSearch = require("yt-search");
+const ytPlaylist = require("ytpl");
+const ytdl = require("ytdl-core-discord");
+const {prefix} = require("../config.json");
 
 async function play(message) {
     const serverQueue = queues.get(message.guildID);
@@ -17,8 +17,8 @@ async function play(message) {
         );
     }
     if(!serverQueue.songs[0]) {
-        queues.delete(message.guildID)
-        setTimeout(() =>serverQueue.voiceChannel.leave(),1800000)
+        queues.delete(message.guildID);
+        setTimeout(() =>serverQueue.voiceChannel.leave(),18000000);
         return;
     }
     serverQueue.playing = true
@@ -38,6 +38,7 @@ async function play(message) {
     serverQueue.dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
     var songInfo = await ytdl.getInfo(serverQueue.songs[0]);
     message.channel.send(`Começando a tocar: **${songInfo.videoDetails.title}**`);
+    console.log(`Começando a tocar: **${songInfo.videoDetails.title}**`);
 }
 
 async function execute(message) {
@@ -57,7 +58,7 @@ async function execute(message) {
     const newQueue = queues.get(message.guildID);
     if(messageTreated.startsWith("http")) {
         if(messageTreated.includes("playlist")) {
-            const playlistSearched = await ytPlaylist(messageTreated)
+            const playlistSearched = await ytPlaylist(messageTreated);
             playlistSearched.items.forEach(element => {
                 newQueue.songs.push(element.url);
             });
@@ -73,8 +74,6 @@ async function execute(message) {
         } catch (error) {
             message.channel.send("Musica não encontrada. Tente Novamente");
         }
-        const ytSearchSong = await ytSearch(messageTreated);
-        newQueue.songs.push(ytSearchSong);
     }
     newQueue.voiceChannel = message.member.voice.channel;
     newQueue.connection = await newQueue.voiceChannel.join();
@@ -87,7 +86,7 @@ async function execute(message) {
 
 function skip(message) {
     const skipQueue = queues.get(message.guildID);
-    if(skipQueue && skipQueue.songs[0]) {
+    if(skipQueue && skipQueue.playing) {
         skipQueue.songs.shift();
         queues.set(message.guildID, skipQueue);
         play(message);
@@ -99,7 +98,7 @@ function skip(message) {
 
 function stop(message) {
     const stopQueue = queues.get(message.guildID);
-    if(stopQueue && stopQueue.songs[0]) {
+    if(stopQueue && stopQueue.playing) {
         stopQueue.songs = [];
         queues.set(message.guildID, stopQueue);
         play(message);
@@ -109,33 +108,35 @@ function stop(message) {
     }
 }
 
-
-module.exports ={
-    songAdd: (client) => {
-        client.on("message", (message)=> {
-            if(message.author.bot)return;
-            if(!message.content.startsWith(`${prefix}`)) return;
-            if(message.content.startsWith(`${prefix}play`)) {
-                execute(message);
-            }
+function lista(message) {
+    const songListFinder = queues.get(message.guildID);
+    if(songListFinder.songs[0]) {
+        songListFinder.songs.forEach(async (element,index) => {
+            const songName = await ytdl.getInfo(element);
+            message.channel.send(`${index+1}. ${songName.videoDetails.title}`);
         })
-    },
-    skipSong : (client) => {
-        client.on("message", (message) => {
-            if(message.author.bot)return;
-            if(!message.content.startsWith(`${prefix}`)) return;
-            if(message.content.startsWith(`${prefix}skip` || `${prefix}pular`)) {
-                skip(message);
-            }
-        })
-    },
-    stopSong : (client) => {
-        client.on("message", (message) => {
-            if(message.author.bot)return;
-            if(!message.content.startsWith(`${prefix}`)) return;
-            if(message.content.startsWith(`${prefix}stop` || `${prefix}parar`)) {
-                stop(message);
-            }
-        })
-    } 
+    }
 }
+
+module.exports = (client) => {
+    client.on("message", (message)=> {
+        if(message.author.bot)return;
+        if(!message.content.startsWith(`${prefix}`)) return;
+        if(message.content.startsWith(`${prefix}play`) || message.content.startsWith(`${prefix}tocar`)) {
+            execute(message);
+        };
+        if(message.content.startsWith(`${prefix}skip`) || message.content.startsWith(`${prefix}pular`) ||
+            message.content.startsWith(`${prefix}next`)) {
+            skip(message);
+        };
+        if(message.content.startsWith(`${prefix}stop`) ||message.content.startsWith( `${prefix}parar`)) {
+            stop(message);
+        };
+        if(message.content.startsWith(`${prefix}list`)) {
+            lista(message);
+        };
+        if(message.content.startsWith(`${prefix}loop`)) {
+            loop(message);
+        };
+    });
+};
