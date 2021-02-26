@@ -38,7 +38,7 @@ const play = async(message) => {
     })
     .on("error", error => console.error(error));
     serverQueue.dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
-    message.channel.send(`Começando a tocar: **${serverQueue.songs[0].title}**`);
+    message.channel.send(`Começando a tocar: **${serverQueue.songs[0].title}**`,{files:[serverQueue.songs[0].thumbnail]});
     console.log(`Começando a tocar: **${serverQueue.songs[0].title}**`);
 }
 
@@ -62,18 +62,18 @@ const execute = async (message) => {
         if(messageTreated.includes("playlist")) {
             const playlistSearched = await ytPlaylist(messageTreated);
             playlistSearched.items.forEach(element => {
-                newQueue.songs.push({url: element.url, title: element.title});
+                newQueue.songs.push({url: element.url, title: element.title, thumbnail: element.thumbnails[0].url});
             });
         }
         else {
             const title = await ytdl.getInfo(messageTreated);
-            newQueue.songs.push({url:messageTreated, title: title.videoDetails.title});
+            newQueue.songs.push({url:messageTreated, title: title.videoDetails.title, thumbnail: title.videoDetails.thumbnails[0].url});
         }
     }
     else {
         try {
             const ytSearchSong = await ytSearch(messageTreated);
-            newQueue.songs.push({url:ytSearchSong.videos[0].url, title:ytSearchSong.videos[0].title});
+            newQueue.songs.push({url:ytSearchSong.videos[0].url, title:ytSearchSong.videos[0].title, thumbnail: ytSearchSong.videos[0].thumbnail});
         } catch (error) {
             message.channel.send("Musica não encontrada. Tente Novamente");
         }

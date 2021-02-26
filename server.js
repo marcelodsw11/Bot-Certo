@@ -29,5 +29,6 @@ client.on("message",async (message) => {
         message.channel.send(`Eu sou o bot do canal Life™, se quiser ver os comandos digite: ${prefix}help`);
     }
 })
+app.get("/",(req,res)=> res.send("Bot Ligado"));
 app.listen(process.env.PORT || 5001);
 client.login(token.main);
