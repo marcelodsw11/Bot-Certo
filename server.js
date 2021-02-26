@@ -7,6 +7,7 @@ const helpCommand = require("./commands/help");
 client.queues = new Map();
 
 const newplay = require("./commands/newplay");
+const { measureText } = require("jimp");
 
 client.once("ready", () => {
     console.log("Bot Online")
@@ -21,9 +22,11 @@ client.on("message",async (message) => {
         helpCommand(message);
         return;
     }
-    else if(message.content.startsWith(`${prefix}oi`)) {
-        message.channel.send(`Oi eu sou o bot do canal Life™, se quiser ver os comandos digite ${prefix}help`);
-        return;
+    else if(message.content.startsWith(`${prefix}roi`)) {
+        await message.channel.send(``,
+            {files: ["https://cdn.discordapp.com/attachments/812141208155193344/814670077902716968/roi.gif"]});
+            message.channel.send(`Roi ${message.author.username} né.`);
+        message.channel.send(`Eu sou o bot do canal Life™, se quiser ver os comandos digite: ${prefix}help`);
     }
 })
 app.listen(process.env.PORT || 5001);

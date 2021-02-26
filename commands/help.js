@@ -6,5 +6,8 @@ module.exports = (message) => {
     message.channel.send(`- ${prefix}skip ou ${prefix}pular ou ${prefix}next`);
     message.channel.send(`- ${prefix}stop ou ${prefix}parar`);
     message.channel.send(`- ${prefix}list ou ${prefix}lista`);
-    message.channel.send(`- ${prefix}oi`);
+    message.channel.send(`- ${prefix}jump <número da música na lista>`);
+    message.channel.send(`- ${prefix}loop`);
+    message.channel.send(`- ${prefix}unloop`);
+    message.channel.send(`- ${prefix}roi`);
 }

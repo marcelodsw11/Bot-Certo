@@ -4,7 +4,7 @@ const ytPlaylist = require("ytpl");
 const ytdl = require("ytdl-core-discord");
 const {prefix} = require("../config.json");
 
-async function play(message) {
+const play = async(message) => {
     const serverQueue = queues.get(message.guildID);
     if (!message.member.voice.channel)
         return message.channel.send(
@@ -24,24 +24,25 @@ async function play(message) {
     serverQueue.playing = true
     queues.set(message.guildID, serverQueue)
     serverQueue.dispatcher = await serverQueue.connection
-    .play(await ytdl(serverQueue.songs[0],{filter: "audioonly" }),
+    .play(await ytdl(serverQueue.songs[0].url,{filter: "audioonly" }),
     {
       type: "opus",
     })
     .on("finish", () => {
-        serverQueue.songs.shift();
-        serverQueue.playing = false;
+        if(!serverQueue.loop) {
+            serverQueue.songs.shift();
+        }
+            serverQueue.playing = false;
         queues.set(message.guildID, serverQueue)
         play(message);
     })
     .on("error", error => console.error(error));
     serverQueue.dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
-    var songInfo = await ytdl.getInfo(serverQueue.songs[0]);
-    message.channel.send(`Começando a tocar: **${songInfo.videoDetails.title}**`);
-    console.log(`Começando a tocar: **${songInfo.videoDetails.title}**`);
+    message.channel.send(`Começando a tocar: **${serverQueue.songs[0].title}**`);
+    console.log(`Começando a tocar: **${serverQueue.songs[0].title}**`);
 }
 
-async function execute(message) {
+const execute = async (message) => {
     const queueExist = queues.get(message.guildID);
     if(!queueExist) {
         const queueConstructor = {
@@ -50,7 +51,8 @@ async function execute(message) {
             volume: 5,
             playing: false,
             dispatcher: null,
-            voiceChannel: null
+            voiceChannel: null,
+            loop: false
         };
         queues.set(message.guildID, queueConstructor);
     }
@@ -60,17 +62,18 @@ async function execute(message) {
         if(messageTreated.includes("playlist")) {
             const playlistSearched = await ytPlaylist(messageTreated);
             playlistSearched.items.forEach(element => {
-                newQueue.songs.push(element.url);
+                newQueue.songs.push({url: element.url, title: element.title});
             });
         }
         else {
-            newQueue.songs.push(messageTreated);
+            const title = await ytdl.getInfo(messageTreated);
+            newQueue.songs.push({url:messageTreated, title: title.videoDetails.title});
         }
     }
     else {
         try {
             const ytSearchSong = await ytSearch(messageTreated);
-            newQueue.songs.push(ytSearchSong.videos[0].url);
+            newQueue.songs.push({url:ytSearchSong.videos[0].url, title:ytSearchSong.videos[0].title});
         } catch (error) {
             message.channel.send("Musica não encontrada. Tente Novamente");
         }
@@ -84,37 +87,73 @@ async function execute(message) {
     }
 }
 
-function skip(message) {
+const skip = (message) => {
     const skipQueue = queues.get(message.guildID);
     if(skipQueue && skipQueue.playing) {
-        skipQueue.songs.shift();
-        queues.set(message.guildID, skipQueue);
-        play(message);
+        skipQueue.dispatcher.end();
     }
     else {
         message.channel.send("Não há nenuma música para pular");
     }
 }
 
-function stop(message) {
+const stop = (message) => {
     const stopQueue = queues.get(message.guildID);
     if(stopQueue && stopQueue.playing) {
-        stopQueue.songs = [];
-        queues.set(message.guildID, stopQueue);
-        play(message);
+        stopQueue.dispatcher.destroy();
+        stopQueue.connection.disconnect();
+        queues.delete(message.guildID);
     }
     else {
         message.channel.send("Não há nenuma música tocando no momento");
     }
 }
 
-function lista(message) {
+const lista = (message) => {
     const songListFinder = queues.get(message.guildID);
     if(songListFinder.songs[0]) {
-        songListFinder.songs.forEach(async (element,index) => {
-            const songName = await ytdl.getInfo(element);
-            message.channel.send(`${index+1}. ${songName.videoDetails.title}`);
+        songListFinder.songs.forEach((element,index) => {
+            const songName = element;
+            message.channel.send(`${index+1}. ${songName.title}`);
         })
+    }
+}
+
+const loop = (message) => {
+    const songListLoop = queues.get(message.guildID);
+
+    if(songListLoop && songListLoop.songs[0]) {
+        songListLoop.loop = true;
+        queues.set(message.guildID, songListLoop);
+        message.channel.send("Música colocada em loop");
+    }
+}
+const unloop = (message) => {
+    const songListUnloop = queues.get(message.guildID);
+
+    if(songListUnloop && songListUnloop.songs[0]) {
+        songListUnloop.loop = false;
+        queues.set(message.guildID, songListUnloop);
+        message.channel.send("Música tirada de loop")
+    }
+}
+
+const goto = (message) => {
+    const numberTreated = parseInt(message.content.substr(5),10);
+    const queueGoto = queues.get(message.guildID);
+    if(numberTreated) {
+        if(numberTreated >= queueGoto.songs.length || numberTreated < 0) 
+        return message.channel.send("Digite um valor de música correspondente à musica na fila");
+        let temporary = queueGoto.songs.splice(numberTreated-1, 1);
+        queueGoto.songs = temporary.concat(queueGoto.songs);
+        queueGoto.dispatcher.destroy();
+        queues.set(message.guildID,queueGoto);
+        message.channel.send(`Pulado com sucesso`);
+        play(message);
+        
+    }
+    else {
+        message.channel.send(`O valor digitado não é um número.`)
     }
 }
 
@@ -137,6 +176,12 @@ module.exports = (client) => {
         };
         if(message.content.startsWith(`${prefix}loop`)) {
             loop(message);
+        };
+        if(message.content.startsWith(`${prefix}unloop`)) {
+            unloop(message);
+        };
+        if(message.content.startsWith(`${prefix}jump `)) {
+            goto(message);
         };
     });
 };
