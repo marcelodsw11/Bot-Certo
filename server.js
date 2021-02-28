@@ -17,12 +17,12 @@ app.use(cors());
 
 if(status) {
     statusResult.token = token.main;
-    statusResult.stats = {name:"Testando os Comandos", type: "PLAYING"};
+    statusResult.stats = {name: "Pronto para Tocar", type: "LISTENING"};
 }
 else {
     statusResult.token = token.teste;
-    statusResult.stats = {name: "Pronto para Tocar", type: "LISTENING"};
     statusResult.prefix = "&"
+    statusResult.stats = {name:"Testando os Comandos", type: "PLAYING"};
 }
 
 client.once("ready", () => {
