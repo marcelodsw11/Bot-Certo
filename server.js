@@ -3,7 +3,8 @@ const {token,prefix} = require("./config.json");
 const Discord = require("discord.js");
 const client = new Discord.Client();
 const helpCommand = require("./commands/help");
-const status = true;
+const cors = require("cors");
+const status = false;
 const queues = new Map();
 const statusResult = {
     token: null,
@@ -12,6 +13,7 @@ const statusResult = {
 };
 const newplay = require("./commands/newplay");
 const app = express();
+app.use(cors());
 
 if(status) {
     statusResult.token = token.main;
