@@ -4,7 +4,7 @@ const Discord = require("discord.js");
 const client = new Discord.Client();
 const helpCommand = require("./commands/help");
 const cors = require("cors");
-const status = false;
+const status = true;
 const queues = new Map();
 const statusResult = {
     token: null,
