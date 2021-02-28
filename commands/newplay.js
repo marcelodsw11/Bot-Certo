@@ -67,7 +67,7 @@ const execute = async (message) => {
         };
         queues.set(message.guild.id, queueConstructor);
     }
-    const messageTreated = message.content.substr(6);
+    const messageTreated = message.content.substr(message.content.indexOf(" ")+1);
     const newQueue = queues.get(message.guild.id);
     if(messageTreated.startsWith("http")) {
         if(messageTreated.includes("playlist")) {
@@ -173,7 +173,8 @@ module.exports = {
         client.on("message", (message)=> {
             if(message.author.bot)return;
             if(!message.content.startsWith(`${prefix}`)) return;
-            if(message.content.startsWith(`${prefix}play`) || message.content.startsWith(`${prefix}tocar`)) {
+            if(message.content.startsWith(`${prefix}play`) || message.content.startsWith(`${prefix}tocar`) || 
+            message.content.startsWith(`${prefix}p ` )) {
                     execute(message);
             };
             if(message.content.startsWith(`${prefix}skip`) || message.content.startsWith(`${prefix}pular`) ||
