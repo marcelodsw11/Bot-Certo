@@ -2,6 +2,8 @@ const fetchServerData = async() => {
     const dados = await axios.get("https://botlifeteam.herokuapp.com/music", {})
     if(dados.data.title) {
         document.getElementById("music").innerHTML = `Tocando Agora: ${dados.data.title}`;
+    }else {
+        document.getElementById("music").innerHTML ="Tocando Agora: Nenhuma Música"
     }
     setTimeout(fetchServerData, 30000);
 }
