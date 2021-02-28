@@ -38,7 +38,18 @@ const play = async(message) => {
     })
     .on("error", error => console.error(error));
     serverQueue.dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
-    message.channel.send(`Começando a tocar: **${serverQueue.songs[0].title}**`,{files:[serverQueue.songs[0].thumbnail]});
+    //message.channel.send(`Começando a tocar: **${serverQueue.songs[0].title}**`,{files:[serverQueue.songs[0].thumbnail]});
+    message.channel.send(`Começando a tocar:`,
+        {
+            embed:
+            {
+                image:{
+                    url: serverQueue.songs[0].thumbnail
+                },
+                title: serverQueue.songs[0].title
+            }
+        }
+    );
     console.log(`Começando a tocar: **${serverQueue.songs[0].title}**`);
 }
 
@@ -122,7 +133,7 @@ const lista = (message) => {
 const loop = (message) => {
     const songListLoop = queues.get(message.guildID);
 
-    if(songListLoop && songListLoop.songs[0]) {
+    if(songListLoop && songListLoop.songs[0] && !songListLoop.loop) {
         songListLoop.loop = true;
         queues.set(message.guildID, songListLoop);
         message.channel.send("Música colocada em loop");
@@ -131,7 +142,7 @@ const loop = (message) => {
 const unloop = (message) => {
     const songListUnloop = queues.get(message.guildID);
 
-    if(songListUnloop && songListUnloop.songs[0]) {
+    if(songListUnloop && songListUnloop.songs[0] && songListUnloop.loop) {
         songListUnloop.loop = false;
         queues.set(message.guildID, songListUnloop);
         message.channel.send("Música tirada de loop")

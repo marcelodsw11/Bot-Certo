@@ -3,32 +3,41 @@ const {token,prefix} = require("./config.json");
 const Discord = require("discord.js");
 const client = new Discord.Client();
 const helpCommand = require("./commands/help");
+const status = true;
+const statusResult = {
+    token: null,
+    stats: null,
+    prefix: "*"
+};
+const newplay = require("./commands/newplay");
+const app = express();
+
+if(status) {
+    statusResult.token = token.main;
+    statusResult.stats = {name:"Testando os Comandos", type: "PLAYING"};
+}
+else {
+    statusResult.token = token.teste;
+    statusResult.stats = {name: "Pronto para Tocar", type: "LISTENING"};
+    statusResult.prefix = "&"
+}
 
 client.queues = new Map();
 
-const newplay = require("./commands/newplay");
-const { measureText } = require("jimp");
-
 client.once("ready", () => {
-    console.log("Bot Online")
+    console.log(`Bot ${client.user.username} Online`)
     newplay(client);
+    helpCommand(client);
+    client.user.setPresence({
+        status: "online",
+        activity: statusResult.stats
+    })
 })
 
-const app = express();
-client.on("message",async (message) => {
-    if(message.author.bot) return;
-    else if(!message.content.startsWith(prefix)) return;
-    else if(message.content.startsWith(`${prefix}help`)) {
-        helpCommand(message);
-        return;
-    }
-    else if(message.content.startsWith(`${prefix}roi`)) {
-        await message.channel.send(``,
-            {files: ["https://cdn.discordapp.com/attachments/812141208155193344/814670077902716968/roi.gif"]});
-            message.channel.send(`Roi ${message.author.username} né.`);
-        message.channel.send(`Eu sou o bot do canal Life™, se quiser ver os comandos digite: ${prefix}help`);
-    }
-})
-app.get("/",(req,res)=> res.send("Bot Ligado"));
+app.use("/",express.static('public'));
+
 app.listen(process.env.PORT || 5001);
-client.login(token.main);
+
+client.login(statusResult.token);
+
+module.exports = statusResult.prefix;
