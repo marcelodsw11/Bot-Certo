@@ -110,12 +110,19 @@ justify-content: center;
 align-items: center;
 height:100%;
 margin: auto;
-padding-top: 65%;
+padding-top: 550px;
 /* 	width: 350px; */
 font-size:42px;
 font-family: Helvetica, sans-serif, Arial;
-animation: load 1.2s infinite 0s ease-in-out;
+animation: load 3.2s infinite 0s ease-in-out;
 animation-direction: alternate;
 text-shadow: 0 0 1px blueviolet;
 color: white;
+}
+
+img {
+ position: fixed;
+ top: 40%;
+ left: 45%;
+border-radius: 45%;
 }
