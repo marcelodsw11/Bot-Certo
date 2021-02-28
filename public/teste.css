@@ -121,9 +121,10 @@ color: white;
 }
 
 img {
- position: fixed;
+  position: fixed;
  top: 40%;
- left: 45.5%;
+ left: 45%;
+ text-align: center;
 border-radius: 50%;
 }
 h3 {
