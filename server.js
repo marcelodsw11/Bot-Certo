@@ -4,6 +4,7 @@ const Discord = require("discord.js");
 const client = new Discord.Client();
 const helpCommand = require("./commands/help");
 const status = true;
+const queues = new Map();
 const statusResult = {
     token: null,
     stats: null,
@@ -22,22 +23,27 @@ else {
     statusResult.prefix = "&"
 }
 
-client.queues = new Map();
-
 client.once("ready", () => {
     console.log(`Bot ${client.user.username} Online`)
-    newplay(client);
+    newplay.music(client);
     helpCommand(client);
     client.user.setPresence({
         status: "online",
         activity: statusResult.stats
     })
+    app.get("/music",(req,res)=> {
+        if(newplay.queues()) {
+            res.send(newplay.queues().songs[0]);
+            return;
+        }
+        res.send({title:null})
+        
+    })
 })
 
 app.use("/",express.static('public'));
 
+
 app.listen(process.env.PORT || 5001);
 
 client.login(statusResult.token);
-
-module.exports = statusResult.prefix;

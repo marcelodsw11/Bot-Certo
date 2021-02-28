@@ -110,7 +110,7 @@ justify-content: center;
 align-items: center;
 height:100%;
 margin: auto;
-padding-top: 550px;
+padding-top: 450px;
 /* 	width: 350px; */
 font-size:42px;
 font-family: Helvetica, sans-serif, Arial;
@@ -124,5 +124,15 @@ img {
  position: fixed;
  top: 40%;
  left: 45.5%;
-border-radius: 45%;
+border-radius: 50%;
+}
+h3 {
+  text-align: center;
+  color: white;
+  font-family: Arial, Helvetica, sans-serif;
+}
+h1 {
+  text-align: center;
+  color: white;
+  font-family: Arial, Helvetica, sans-serif;
 }
