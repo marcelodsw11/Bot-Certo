@@ -3,7 +3,7 @@ const fetchServerData = async() => {
     if(dados.data.title) {
         document.getElementById("music").innerHTML = `Tocando Agora: ${dados.data.title}`;
     }else {
-        document.getElementById("music").innerHTML ="Tocando Agora: Nenhuma Música"
+        document.getElementById("music").innerHTML ="Tocando Agora: Sem músicas na fila"
     }
     setTimeout(fetchServerData, 30000);
 }
