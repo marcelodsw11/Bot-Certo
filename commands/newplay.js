@@ -42,7 +42,8 @@ const play = async(message) => {
     })
     .on("finish", () => {
         if(!serverQueue.loop) {
-            serverQueue.songs.shift();    
+            serverQueue.songs.shift();
+            notifyAll({title:null, url:null}) 
             serverQueue.playing = false;
         }
         queues.set(message.guild.id, serverQueue)
