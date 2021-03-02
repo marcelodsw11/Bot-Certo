@@ -1,4 +1,4 @@
-var socket = io("http://localhost:5001");
+var socket = io("http://https://botlifeteam.herokuapp.com/music:5001");
 
 const fetchServerData = (dados) => {
     console.log(dados)
