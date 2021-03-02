@@ -1,4 +1,4 @@
-var socket = io("https://botlifeteam.herokuapp.com/music");
+var socket = io(`http://localhost:5001`);
 
 const fetchServerData = (dados) => {
     console.log(dados)
@@ -11,7 +11,10 @@ const fetchServerData = (dados) => {
     }
 }
 socket.on("newSong", data => {
-    fetchServerData(data)
-})
-//http://localhost:5001/music
-//https://botlifeteam.herokuapp.com/music
+    fetchServerData(data);
+});
+socket.on("world", data => {
+    fetchServerData(data);
+});
+//http://localhost:5001
+//https://botlifeteam.herokuapp.com:${process.env.PORT}

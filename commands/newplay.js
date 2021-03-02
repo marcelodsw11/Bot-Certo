@@ -9,10 +9,8 @@ const state = {
 const ioEnv = require("../server");
 const subscribe = (obseverFunction) => {
     state.observers.push(obseverFunction)
-    console.log("ok")
 }
 const notifyAll = (command) => {
-    console.log(state.observers[0])
     for (const obseverFunction of state.observers) {
         obseverFunction("newSong",command)
     }
@@ -217,5 +215,8 @@ module.exports = {
             };
         });
     },
-    subscribe
+    subscribe,
+    queues: ()=> {
+        return queues.get("526726202208026627");
+    }
 };

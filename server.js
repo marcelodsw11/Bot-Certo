@@ -4,13 +4,14 @@ const Discord = require("discord.js");
 const client = new Discord.Client();
 const helpCommand = require("./commands/help");
 const cors = require("cors");
-const status = true;
+const status = false;
 const statusResult = {
     token: null,
     stats: null,
     prefix: "*"
 };
 const newplay = require("./commands/newplay");
+const { title } = require("process");
 const app = express();
 const http = require("http").createServer(app);
 const io = require("socket.io")(http);
@@ -42,14 +43,20 @@ app.use("/",(req,res)=> {
     res.sendFile(__dirname+"/bot.html")
 })
 
-   function data(eventData,data) {
+function data(eventData,data) {
     io.emit(eventData,data);
-    console.log(data)
-    }
+}
 client.login(statusResult.token);
 io.on("connection",async (socket) => {
     console.log(socket.id)
-    
+    let queueMusic;
+        queueMusic = newplay.queues();
+    if(queueMusic) {
+        socket.emit("world", queueMusic.songs[0]);
+    }else {
+        console.log("oi")
+        socket.emit("world", {title:null, url:null});
+    }
 })
 newplay.subscribe(data)
 
