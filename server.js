@@ -1,11 +1,10 @@
 const express = require("express");
-const {token,prefix} = require("./config.json");
+const {token} = require("./config.json");
 const Discord = require("discord.js");
 const client = new Discord.Client();
 const helpCommand = require("./commands/help");
 const cors = require("cors");
 const status = true;
-const queues = new Map();
 const statusResult = {
     token: null,
     stats: null,
@@ -13,6 +12,9 @@ const statusResult = {
 };
 const newplay = require("./commands/newplay");
 const app = express();
+const http = require("http").createServer(app);
+const io = require("socket.io")(http);
+http.listen(process.env.PORT || 5001,(req,res) => console.log("Server ON"));
 app.use(cors());
 
 if(status) {
@@ -32,20 +34,21 @@ client.once("ready", () => {
     client.user.setPresence({
         status: "online",
         activity: statusResult.stats
-    })
-    app.get("/music",(req,res)=> {
-        if(newplay.queues()) {
-            res.send(newplay.queues().songs[0]);
-            return;
-        }
-        res.send({title:null})
-        
-    })
+    });
 })
 
-app.use("/",express.static('public'));
+app.use("/",(req,res)=> {
+    res.sendFile(__dirname+"/bot.html")
+})
 
-
-app.listen(process.env.PORT || 5001);
-
+   function data(eventData,data) {
+    io.emit(eventData,data);
+    console.log(data)
+    }
 client.login(statusResult.token);
+io.on("connection",async (socket) => {
+    console.log(socket.id)
+    
+})
+newplay.subscribe(data)
+

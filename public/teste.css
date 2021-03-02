@@ -110,7 +110,7 @@ justify-content: center;
 align-items: center;
 height:100%;
 margin: auto;
-padding-top: 34%;
+padding-top: 43%;
 /* 	width: 350px; */
 font-size:42px;
 font-family: Helvetica, sans-serif, Arial;
@@ -127,36 +127,19 @@ h3 {
   font-family: Arial, Helvetica, sans-serif;
 }
 h1 {
+  top: 10%;
+  position: fixed;
   text-align: center;
   color: white;
   font-family: Arial, Helvetica, sans-serif;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 img {
-  position: absolute;
+  position: fixed;
   top: 50%; 
   left: 50%;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-}
-
-@media only screen and (max-width: 720px) {
-  .animate{
-    padding-top: 75%;
-  }
-}
-@media only screen and (max-width: 620px) {
-  .animate{
-    padding-top: 85%;
-  }
-}
-@media only screen and (max-width: 420px) {
-  .animate{
-    padding-top: 95%;
-  }
-}
-@media only screen and (max-width: 800px) {
-  .animate{
-    padding-top: 70%;
-  }
 }

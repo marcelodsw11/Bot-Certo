@@ -1,12 +1,17 @@
-const fetchServerData = async() => {
-    const dados = await axios.get("https://botlifeteam.herokuapp.com/music", {})
-    if(dados.data.title) {
-        document.getElementById("music").innerHTML = `Tocando Agora: ${dados.data.title}`;
+var socket = io("http://localhost:5001");
+
+const fetchServerData = (dados) => {
+    console.log(dados)
+    let musicName = document.getElementById("music").innerHTML;
+    if (musicName === dados.title) return;
+    if(dados.title) {
+        document.getElementById("music").innerHTML = `Tocando Agora: ${dados.title}`;
     }else {
         document.getElementById("music").innerHTML ="Tocando Agora: Sem músicas na fila"
     }
-    setTimeout(fetchServerData, 30000);
 }
-fetchServerData();
+socket.on("newSong", data => {
+    fetchServerData(data)
+})
 //http://localhost:5001/music
 //https://botlifeteam.herokuapp.com/music

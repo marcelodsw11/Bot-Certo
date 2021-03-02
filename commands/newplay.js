@@ -3,7 +3,20 @@ const ytSearch = require("yt-search");
 const ytPlaylist = require("ytpl");
 const ytdl = require("ytdl-core-discord");
 const {prefix} = require("../config.json");
-
+const state = {
+    observers: []
+}
+const ioEnv = require("../server");
+const subscribe = (obseverFunction) => {
+    state.observers.push(obseverFunction)
+    console.log("ok")
+}
+const notifyAll = (command) => {
+    console.log(state.observers[0])
+    for (const obseverFunction of state.observers) {
+        obseverFunction("newSong",command)
+    }
+}
 const play = async(message) => {
     const serverQueue = queues.get(message.guild.id);
     if (!message.member.voice.channel)
@@ -23,16 +36,17 @@ const play = async(message) => {
     }
     serverQueue.playing = true
     queues.set(message.guild.id, serverQueue)
+    notifyAll(serverQueue.songs[0]);
     serverQueue.dispatcher = await serverQueue.connection
-    .play(await ytdl(serverQueue.songs[0].url,{filter: "audioonly" }),
+    .play(await ytdl(serverQueue.songs[0].url,{ type: 'opus' }),
     {
-      type: "opus",
+      type: "opus"
     })
     .on("finish", () => {
         if(!serverQueue.loop) {
-            serverQueue.songs.shift();
-        }
+            serverQueue.songs.shift();    
             serverQueue.playing = false;
+        }
         queues.set(message.guild.id, serverQueue)
         play(message);
     })
@@ -41,8 +55,7 @@ const play = async(message) => {
     //message.channel.send(`Começando a tocar: **${serverQueue.songs[0].title}**`,{files:[serverQueue.songs[0].thumbnail]});
     message.channel.send(`Começando a tocar:`,
         {
-            embed:
-            {
+            embed:{
                 image:{
                     url: serverQueue.songs[0].thumbnail
                 },
@@ -102,6 +115,11 @@ const skip = (message) => {
     const skipQueue = queues.get(message.guild.id);
     if(skipQueue && skipQueue.playing) {
         skipQueue.dispatcher.end();
+        if(skipQueue.songs[1]){
+            notifyAll(skipQueue.songs[1]);
+        }else{
+            notifyAll({title:null, url:null}) 
+        }
     }
     else {
         message.channel.send("Não há nenuma música para pular");
@@ -113,6 +131,7 @@ const stop = (message) => {
     if(stopQueue && stopQueue.playing) {
         stopQueue.dispatcher.destroy();
         stopQueue.connection.disconnect();
+        notifyAll({title:null, url:null})
         queues.delete(message.guild.id);
     }
     else {
@@ -198,5 +217,5 @@ module.exports = {
             };
         });
     },
-    queues: ()=> {return queues.get("526726202208026627")}
+    subscribe
 };
