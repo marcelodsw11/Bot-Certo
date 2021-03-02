@@ -37,6 +37,7 @@ client.once("ready", () => {
     });
 })
 
+app.use("/public",express.static("public"));
 app.use("/",(req,res)=> {
     res.sendFile(__dirname+"/bot.html")
 })
