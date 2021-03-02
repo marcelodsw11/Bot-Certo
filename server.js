@@ -11,7 +11,6 @@ const statusResult = {
     prefix: "*"
 };
 const newplay = require("./commands/newplay");
-const { title } = require("process");
 const app = express();
 const http = require("http").createServer(app);
 const io = require("socket.io")(http);
@@ -54,7 +53,6 @@ io.on("connection",async (socket) => {
     if(queueMusic) {
         socket.emit("world", queueMusic.songs[0]);
     }else {
-        console.log("oi")
         socket.emit("world", {title:null, url:null});
     }
 })
